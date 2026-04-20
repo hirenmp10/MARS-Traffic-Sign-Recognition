@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Project specific
+*.mp4
+*.MOV
+*.avi
+.DS_Store
+.idea/
+.vscode/
+
+# ROS 2 stuff that shouldn't be pushed if generated
+install/
+build/
+log/
