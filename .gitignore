@@ -4,22 +4,36 @@ __pycache__/
 *$py.class
 
 # Environments
-.env
 .venv
 venv/
-ENV/
-env.bak/
-venv.bak/
 
-# Project specific
+# Reports (Explicitly excluded per user request)
+Mini_Project_Report_Jackfruit.md
+Viva/viva_preparation.md
+
+# Videos and large media
 *.mp4
 *.MOV
 *.avi
+
+# Experimental/Secondary Scripts
+adverse.py
+brute_force.py
+eval.py
+find_working_stop.py
+get_gtsrb.py
+run_traffic_sign_dashboard.py
+simulation_dry_run.py
+test_model.py
+test_sort.py
+Viva/Viva.py
+
+# Local junk
 .DS_Store
 .idea/
 .vscode/
 
-# ROS 2 stuff that shouldn't be pushed if generated
+# ROS 2 build artifacts
 install/
 build/
 log/
