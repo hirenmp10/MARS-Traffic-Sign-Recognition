@@ -36,10 +36,10 @@ pip install -r requirements.txt
 ```
 
 ## 📈 Performance
-The model is evaluated using the GTSRB test set. Use `eval.py` to check the accuracy metrics.
+The model is evaluated using the GTSRB test set.
 
 ## 👥 Contributors
 - Harini Hegde
 - Kaparthy Reddy
-- Hiren MP
+- Hiren M P
 - Ishanvee Amit Sinha
