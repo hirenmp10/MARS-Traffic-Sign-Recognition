@@ -2,7 +2,6 @@
 
 import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
-
 import argparse
 import cv2
 import numpy as np
@@ -12,11 +11,9 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
 from cv_bridge import CvBridge
-
 from preprocess import preprocess_image, detect_sign_regions
-
-# Monkey patch for Keras serialization bug in some TF versions
 import tensorflow as tf
+
 original_init = tf.keras.layers.Dense.__init__
 def new_init(self, *args, **kwargs):
     kwargs.pop('quantization_config', None)
@@ -28,7 +25,6 @@ print("🚀 Script started")
 model = None
 try:
     print("📦 Loading model...")
-    import tensorflow as tf
     model = tf.keras.models.load_model('traffic_sign_model_clean.keras', compile=False)
     print("✅ Model loaded successfully")
 except Exception as e:
@@ -83,27 +79,21 @@ CLASS_LABELS = [
 ]
 
 class SignDetectorNode(Node):
-    """
-    The main ROS 2 Node that integrates Vision with the Robot system.
-    """
+    
     def __init__(self, source):
-        # Initialize the ROS 2 node with the name 'sign_detector'
+        
         super().__init__('sign_detector')
         
-        # Publisher: Sends the annotated image for the dashboard to see
         self.image_pub = self.create_publisher(Image, '/annotated_image', 10)
         
-        # Publisher: Sends the detected sign label for the robot controller to use
         self.sign_pub = self.create_publisher(String, '/detected_sign', 10)
         
-        # Bridge: Converts ROS Image messages to OpenCV format and vice versa
         self.bridge = CvBridge()
         
         self.source = source
         self.cap = None
         self.fallback_to_dummy = False
 
-        # Check if source is an image file
         self.source_is_image = isinstance(source, str) and source.lower().endswith(('.jpg', '.jpeg', '.png'))
 
         if self.source_is_image:
@@ -116,7 +106,7 @@ class SignDetectorNode(Node):
                 self.cap = None
                 self.fallback_to_dummy = True
 
-        self.show_debug = True # Can be made a ROS parameter later
+        self.show_debug = True 
         print("🚀 Starting detection... Press ESC in the debug window to exit")
 
     def make_dummy_frame(self):
@@ -129,8 +119,6 @@ class SignDetectorNode(Node):
 
     def run(self):
         prev_time = 0
-
-        # Preload image if image mode
         frame_orig = None
         if self.source_is_image:
             frame_orig = cv2.imread(self.source)
@@ -158,38 +146,28 @@ class SignDetectorNode(Node):
                 if roi is None or roi.size == 0:
                     continue
 
-                # 4. Normalization & Prediction
                 processed = preprocess_image(roi)
-                # Fix color order: OpenCV uses BGR, but our CNN expects RGB
                 processed = processed[..., ::-1] 
                 
                 if model:
-                    # Run the inference on our trained Keras model
                     preds = model.predict(processed, verbose=0)
                 else:
                     preds = np.random.rand(1, 43)
 
-                # Get the class with the highest probability
                 class_id = int(np.argmax(preds))
                 confidence = float(np.max(preds))
 
-                # Heuristic Correction:
-                # Our OpenCV pipeline explicitly masks for RED signs.
-                # If the CNN predicts a BLUE sign (like Turn Left ID 28) on a RED mask,
-                # we know it is a model error (hallucination). We override it to 'Stop' (ID 14).
-                if class_id == 28: # If predicted "Turn Left" (blue)
-                    class_id = 6   # Force it to "Stop" (red)
+                if class_id == 28: 
+                    class_id = 6   
                     confidence = max(0.90, confidence)
 
                 if confidence > 0.5:
                     label = f"{CLASS_LABELS[class_id]} ({confidence:.2f})"
                     
-                    # Drawing on the frame for debugging
                     cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
                     cv2.putText(frame, label, (x, y-10),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
                     
-                    # Publish the result to the ROS network
                     self.sign_pub.publish(String(data=label))
             frame = cv2.resize(frame, (640, 480))
             self.image_pub.publish(self.bridge.cv2_to_imgmsg(frame, 'bgr8'))

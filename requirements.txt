@@ -1,0 +1,5 @@
+tensorflow>=2.15.0
+numpy
+opencv-python
+tensorflow-datasets
+h5py

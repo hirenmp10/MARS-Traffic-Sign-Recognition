@@ -19,12 +19,12 @@ Viva/viva_preparation.md
 # Experimental/Secondary Scripts
 adverse.py
 brute_force.py
-eval.py
+# eval.py (Un-ignored for GitHub)
 find_working_stop.py
 get_gtsrb.py
-run_traffic_sign_dashboard.py
+# run_traffic_sign_dashboard.py (Un-ignored for GitHub)
 simulation_dry_run.py
-test_model.py
+# test_model.py (Un-ignored for GitHub)
 test_sort.py
 Viva/Viva.py
 
